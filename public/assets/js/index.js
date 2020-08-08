@@ -1,3 +1,6 @@
+const { response } = require('express');
+const notes = require('../../../lib/notes');
+
 var $noteTitle = $(".note-title");
 var $noteText = $(".note-textarea");
 var $saveNoteBtn = $(".save-note");
@@ -8,20 +11,56 @@ var $noteList = $(".list-container .list-group");
 var activeNote = {};
 
 // A function for getting all notes from the db
-var getNotes = function() {
-  return $.ajax({
-    url: "/api/notes",
-    method: "GET"
+var getNotes = function(formData = {}) {
+  let queryUrl = '/api/notes?';
+
+  Object.entries(formData).forEach(([key, value]) => {
+    queryUrl += `${key}=${value}&`;
   });
+
+  console.log(queryUrl);
+  fetch(queryUrl)
+    .then(response => {
+      if(!response.ok) {
+        return alert('Error: ' + response.statusText);
+      }
+      return response.json()
+    })
+    .then(notes => {
+      console.log(notes)
+      printResults(notes);
+    });
+  // return $.ajax({
+  //   url: "/api/notes",
+  //   method: "GET"
+  // });
 };
 
 // A function for saving a note to the db
 var saveNote = function(note) {
-  return $.ajax({
-    url: "/api/notes",
-    data: note,
-    method: "POST"
-  });
+  fetch('/api/notes', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(note)
+  })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      alert('Error: ' + response.statusText);
+    })
+    .then(postResponse => {
+      console.log(postResponse);
+      alert('Thank you for adding a new note!');
+    });
+  // return $.ajax({
+  //   url: "/api/notes",
+  //   data: note,
+  //   method: "POST"
+  // });
 };
 
 // BONUS A function for deleting a note from the db
@@ -53,7 +92,8 @@ var renderActiveNote = function() {
 var handleNoteSave = function() {
   var newNote = {
     title: $noteTitle.val(),
-    text: $noteText.val()
+    text: $noteText.val(),
+    id: notes.length + 1
   };
 
   saveNote(newNote).then(function(data) {
