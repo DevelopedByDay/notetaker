@@ -1,5 +1,5 @@
-const { findById, createNewNote, showNotes} = require('../../lib/notes');
-const { notes } = require('../../db/db.json');
+const { findById, createNewNote } = require('../../lib/notes');
+const { notes } = require('../../db/notes.json');
 const router = require('express').Router();
 
 router.get('/notes', (req, res) => {
