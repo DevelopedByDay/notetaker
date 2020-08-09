@@ -1,5 +1,5 @@
 const { findById, createNewNote } = require('../../lib/notes.js');
-const { notes } = require('../../db/notes.json');
+const notes = require('../../db/notes.json');
 const router = require('express').Router();
 
 router.get('/notes', (req, res) => {
@@ -20,11 +20,11 @@ router.get('/notes/:id', (req, res) => {
 router.post('/notes', (req, res) => {
     console.log(req.body);
 
-    req.body.id = notes.length.toString();
+    req.body.id = notes.length + 1
 
-    const notes = createNewNote(req.body, notes);
+    const newNotes = createNewNote(req.body, notes);
 
-    res.json(notes);
+    res.json(newNotes);
 });
 
 module.exports = router;
